@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div style="padding: 100px 2rem 2rem 2rem;">
+    <div style="max-width: 1000px; margin: 0 auto;">
+        <!-- Back button -->
+        <a href="{% url 'character_list' %}" style="color: var(--got-gold); text-decoration: none; margin-bottom: 2rem; display: inline-block;">
+            <i class="fas fa-arrow-left"></i> Back to Characters
+        </a>
+        
+        <!-- Character Header -->
+        <div style="display: flex; gap: 3rem; margin-bottom: 3rem; background: rgba(0,0,0,0.5); padding: 2rem; border: 1px solid var(--got-gold); border-radius: 12px;">
+            <div style="width: 300px; height: 400px; background: linear-gradient(45deg, var(--got-dark-red), var(--got-black)); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 8rem; color: var(--got-gold);">
+                    <i class="fas fa-user-circle"></i>
+                </span>
+            </div>
+            
+            <div style="flex: 1;">
+                <h1 style="color: var(--got-gold); font-size: 3rem; margin-bottom: 0.5rem;">{{ character.name }}</h1>
+                
+                {% if character.house %}
+                <p style="color: var(--got-silver); font-size: 1.5rem; margin-bottom: 1rem;">House {{ character.house.name }}</p>
+                {% endif %}
+                
+                <!-- Also known as -->
+                {% if character.also_known_as %}
+                <div style="margin-bottom: 1rem;">
+                    <strong style="color: var(--got-gold);">Also known as:</strong>
+                    <p style="color: var(--got-silver);">{{ character.also_known_as|join:", " }}</p>
+                </div>
+                {% endif %}
+                
+                <!-- Titles -->
+                {% if character.titles %}
+                <div style="margin-bottom: 1rem;">
+                    <strong style="color: var(--got-gold);">Titles:</strong>
+                    <ul style="color: var(--got-silver); margin-left: 1.5rem;">
+                        {% for title in character.titles %}
+                        <li>{{ title }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                <!-- Dragon -->
+                {% if character.dragon %}
+                <div style="margin-bottom: 1rem;">
+                    <strong style="color: var(--got-gold);">Dragon:</strong>
+                    <span style="color: var(--got-silver);">{{ character.dragon }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Life Details -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+            <div style="background: rgba(0,0,0,0.5); padding: 1.5rem; border: 1px solid var(--got-gold); border-radius: 8px;">
+                <h2 style="color: var(--got-gold); margin-bottom: 1rem;">Life Details</h2>
+                <p><strong style="color: var(--got-gold);">Born:</strong> <span style="color: var(--got-silver);">{{ character.born|default:"Unknown" }}</span></p>
+                <p><strong style="color: var(--got-gold);">Died:</strong> <span style="color: var(--got-silver);">{{ character.died|default:"Still alive" }}</span></p>
+                <p><strong style="color: var(--got-gold);">Culture:</strong> <span style="color: var(--got-silver);">{{ character.culture|default:"Unknown" }}</span></p>
+                <p><strong style="color: var(--got-gold);">Gender:</strong> <span style="color: var(--got-silver);">{{ character.get_gender_display }}</span></p>
+            </div>
+            
+            <div style="background: rgba(0,0,0,0.5); padding: 1.5rem; border: 1px solid var(--got-gold); border-radius: 8px;">
+                <h2 style="color: var(--got-gold); margin-bottom: 1rem;">Family</h2>
+                {% if father %}
+                <p><strong style="color: var(--got-gold);">Father:</strong> <a href="{% url 'character_detail' father.id %}" style="color: var(--got-silver);">{{ father.name }}</a></p>
+                {% endif %}
+                {% if mother %}
+                <p><strong style="color: var(--got-gold);">Mother:</strong> <a href="{% url 'character_detail' mother.id %}" style="color: var(--got-silver);">{{ mother.name }}</a></p>
+                {% endif %}
+                {% if character.spouse.all %}
+                <p><strong style="color: var(--got-gold);">Spouse(s):</strong> 
+                    {% for spouse in character.spouse.all %}
+                    <a href="{% url 'character_detail' spouse.id %}" style="color: var(--got-silver);">{{ spouse.name }}</a>{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Family Members -->
+        {% if children %}
+        <div style="background: rgba(0,0,0,0.5); padding: 1.5rem; border: 1px solid var(--got-gold); border-radius: 8px; margin-bottom: 2rem;">
+            <h2 style="color: var(--got-gold); margin-bottom: 1rem;">Children</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">
+                {% for child in children %}
+                <a href="{% url 'character_detail' child.id %}" style="color: var(--got-silver); text-decoration: none; padding: 0.5rem; background: rgba(197,160,40,0.1); border-radius: 4px; text-align: center;">
+                    {{ child.name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if siblings %}
+        <div style="background: rgba(0,0,0,0.5); padding: 1.5rem; border: 1px solid var(--got-gold); border-radius: 8px;">
+            <h2 style="color: var(--got-gold); margin-bottom: 1rem;">Siblings</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">
+                {% for sibling in siblings %}
+                <a href="{% url 'character_detail' sibling.id %}" style="color: var(--got-silver); text-decoration: none; padding: 0.5rem; background: rgba(197,160,40,0.1); border-radius: 4px; text-align: center;">
+                    {{ sibling.name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

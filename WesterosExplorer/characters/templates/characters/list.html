@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div style="padding: 100px 2rem 2rem 2rem;">
+    <div style="max-width: 1400px; margin: 0 auto;">
+        <h1 style="color: var(--got-gold); text-align: center; margin-bottom: 2rem;">
+            <i class="fas fa-users"></i> {{ title }}
+        </h1>
+        
+        <!-- Stats -->
+        <div style="text-align: center; margin-bottom: 3rem; color: var(--got-silver);">
+            <p style="font-size: 1.2rem;">Total Characters: <span style="color: var(--got-gold); font-weight: bold;">{{ total_characters }}</span></p>
+        </div>
+        
+        <!-- House Filter -->
+        <div style="margin-bottom: 2rem; text-align: center;">
+            <label style="color: var(--got-gold); margin-right: 1rem;">Filter by House:</label>
+            <select onchange="filterByHouse(this.value)" style="padding: 0.5rem; background: var(--got-black); color: var(--got-silver); border: 1px solid var(--got-gold); border-radius: 4px;">
+                <option value="">All Houses</option>
+                {% for house in houses %}
+                <option value="{{ house.id }}" {% if request.GET.house == house.id|stringformat:"s" %}selected{% endif %}>
+                    {{ house.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <!-- Character Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 2rem;">
+            {% for character in characters %}
+            <div class="character-card" onclick="window.location.href='{% url 'character_detail' character.id %}'" 
+                 style="background: rgba(0,0,0,0.5); border: 1px solid var(--got-gold); border-radius: 8px; padding: 1rem; text-align: center; cursor: pointer; transition: transform 0.3s;">
+                <div style="width: 100%; height: 250px; background: linear-gradient(45deg, var(--got-dark-red), var(--got-black)); border-radius: 8px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 4rem; color: var(--got-gold);">
+                        <i class="fas fa-user-circle"></i>
+                    </span>
+                </div>
+                <h3 style="color: var(--got-gold); margin-bottom: 0.5rem;">{{ character.name }}</h3>
+                {% if character.house %}
+                <p style="color: var(--got-silver);">House {{ character.house.name }}</p>
+                {% endif %}
+                {% if character.titles %}
+                <p style="font-size: 0.9rem; color: var(--got-silver);">{{ character.titles.0 }}</p>
+                {% endif %}
+                <div style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: center;">
+                    {% if character.born %}
+                    <span style="background: var(--got-dark-red); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">Born: {{ character.born }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <p style="text-align: center; grid-column: 1/-1;">No characters found.</p>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div style="margin-top: 3rem; text-align: center;">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.house %}&house={{ request.GET.house }}{% endif %}" class="btn-secondary" style="text-decoration: none;">Previous</a>
+            {% endif %}
+            
+            <span style="margin: 0 1rem; color: var(--got-gold);">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.house %}&house={{ request.GET.house }}{% endif %}" class="btn-secondary" style="text-decoration: none;">Next</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function filterByHouse(houseId) {
+    if (houseId) {
+        window.location.href = '?house=' + houseId;
+    } else {
+        window.location.href = '.';
+    }
+}
+</script>
+{% endblock %}

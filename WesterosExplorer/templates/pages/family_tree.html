@@ -1,0 +1,652 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="tree-container" style="display: flex; height: calc(100vh - 80px); padding-top: 80px;">
+    <!-- Filters Sidebar -->
+    <div class="filters-sidebar">
+        <h2 style="color: var(--got-gold); margin-bottom: 1.5rem;">
+            <i class="fas fa-filter"></i> FILTER HOUSES
+        </h2>
+        
+        <div class="house-filters" style="margin-bottom: 2rem;">
+            <label class="house-filter" style="display: block; margin-bottom: 0.5rem;">
+                <input type="checkbox" class="house-checkbox" value="all" checked id="select-all">
+                <span style="color: var(--got-gold);">👑 Select All</span>
+            </label>
+            <div style="height: 2px; background: var(--got-gold); margin: 1rem 0;"></div>
+            
+            {% for house in houses %}
+            <label class="house-filter" style="display: block; margin-bottom: 0.5rem;" data-house-id="{{ house.id }}">
+                <input type="checkbox" class="house-checkbox" value="{{ house.id }}" checked>
+                <span style="color: {% cycle '#4A0404' '#A5D8FF' '#C5A028' '#8B0000' '#2F4F4F' '#228B22' '#FF6B35' %}">
+                    {% if house.name == 'Targaryen' %}🐉 
+                    {% elif house.name == 'Stark' %}🐺 
+                    {% elif house.name == 'Lannister' %}🦁 
+                    {% elif house.name == 'Baratheon' %}🦌 
+                    {% elif house.name == 'Greyjoy' %}🦑 
+                    {% elif house.name == 'Tyrell' %}🌹 
+                    {% elif house.name == 'Martell' %}☀️ 
+                    {% else %}🏰 
+                    {% endif %}
+                    {{ house.name }}
+                </span>
+                <span style="float: right; color: var(--got-silver); font-size: 0.8rem;">
+                    ({{ house.member_count }})
+                </span>
+            </label>
+            {% endfor %}
+        </div>
+        
+        <div style="height: 2px; background: var(--got-gold); margin: 1rem 0;"></div>
+        
+        <h2 style="color: var(--got-gold); margin: 1.5rem 0;">
+            <i class="fas fa-clock"></i> TIMELINE
+        </h2>
+        <div style="margin-bottom: 2rem;">
+            <input type="range" id="timeline-slider" min="-300" max="305" value="305" step="1" style="width: 100%;">
+            <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                <span style="color: var(--got-silver);">Before Conquest</span>
+                <span id="timeline-value" style="color: var(--got-gold); font-weight: bold;">305 AC</span>
+                <span style="color: var(--got-silver);">After Conquest</span>
+            </div>
+        </div>
+        
+        <div style="height: 2px; background: var(--got-gold); margin: 1rem 0;"></div>
+        
+        <h2 style="color: var(--got-gold); margin: 1.5rem 0;">
+            <i class="fas fa-link"></i> RELATIONSHIPS
+        </h2>
+        <div style="margin-bottom: 2rem;">
+            <label style="display: block; margin-bottom: 0.5rem;">
+                <input type="checkbox" id="show-parent" checked> 
+                <span style="color: #C5A028;">👪 Parent-Child</span>
+            </label>
+            <label style="display: block; margin-bottom: 0.5rem;">
+                <input type="checkbox" id="show-marriage" checked> 
+                <span style="color: #FFD700;">💍 Marriage</span>
+            </label>
+            <label style="display: block; margin-bottom: 0.5rem;">
+                <input type="checkbox" id="show-sibling" checked> 
+                <span style="color: #A5D8FF;">👥 Siblings</span>
+            </label>
+        </div>
+        
+        <div style="height: 2px; background: var(--got-gold); margin: 1rem 0;"></div>
+        
+        <h2 style="color: var(--got-gold); margin: 1.5rem 0;">
+            <i class="fas fa-search"></i> SEARCH
+        </h2>
+        <input type="text" id="character-search" placeholder="Search character..." style="width: 100%; padding: 0.5rem; background: var(--got-black); border: 1px solid var(--got-gold); color: var(--got-silver); border-radius: 4px;">
+        
+        <button onclick="applyFilters()" style="width: 100%; margin-top: 2rem; padding: 1rem; background: var(--got-gold); color: var(--got-black); border: none; border-radius: 4px; font-family: 'Cinzel', serif; cursor: pointer; font-weight: bold;">
+            <i class="fas fa-sync-alt"></i> UPDATE TREE
+        </button>
+        
+        <button onclick="resetView()" style="width: 100%; margin-top: 1rem; padding: 0.5rem; background: transparent; color: var(--got-gold); border: 1px solid var(--got-gold); border-radius: 4px; font-family: 'Cinzel', serif; cursor: pointer;">
+            <i class="fas fa-undo"></i> RESET VIEW
+        </button>
+    </div>
+    
+    <!-- Graph Area -->
+    <div style="flex: 1; position: relative; background: rgba(0,0,0,0.3); overflow: hidden;">
+        <div id="family-graph" style="width: 100%; height: 100%;"></div>
+        
+        <!-- Loading Spinner -->
+        <div id="loading-spinner" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+            <div class="spinner"></div>
+            <p style="color: var(--got-gold); margin-top: 1rem;">Loading family tree...</p>
+        </div>
+        
+        <!-- Character Details Panel -->
+        <div id="character-panel" style="position: absolute; bottom: 20px; right: 20px; width: 300px; background: rgba(0,0,0,0.9); border: 2px solid var(--got-gold); border-radius: 8px; padding: 1rem; display: none; z-index: 1000;">
+            <button onclick="closePanel()" style="position: absolute; top: 5px; right: 5px; background: none; border: none; color: var(--got-gold); font-size: 1.2rem; cursor: pointer;">✖</button>
+            <div id="panel-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Tooltip -->
+<div id="tooltip" style="position: absolute; background: rgba(0,0,0,0.9); border: 1px solid var(--got-gold); color: var(--got-silver); padding: 0.5rem; border-radius: 4px; pointer-events: none; font-size: 0.9rem; display: none; z-index: 1000;"></div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Custom styles for the tree */
+    .node circle {
+        cursor: pointer;
+        transition: r 0.3s;
+    }
+    
+    .node circle:hover {
+        r: 25;
+        filter: drop-shadow(0 0 10px gold);
+    }
+    
+    .node text {
+        font-family: 'Cinzel', serif;
+        font-size: 10px;
+        fill: var(--got-silver);
+        pointer-events: none;
+    }
+    
+    .link {
+        stroke-opacity: 0.6;
+        transition: stroke-opacity 0.3s;
+    }
+    
+    .link:hover {
+        stroke-opacity: 1;
+    }
+    
+    .filters-sidebar {
+        width: 280px;
+        background: rgba(0,0,0,0.9);
+        border-right: 2px solid var(--got-gold);
+        padding: 2rem;
+        overflow-y: auto;
+        height: 100%;
+    }
+    
+    .filters-sidebar::-webkit-scrollbar {
+        width: 5px;
+    }
+    
+    .filters-sidebar::-webkit-scrollbar-track {
+        background: var(--got-black);
+    }
+    
+    .filters-sidebar::-webkit-scrollbar-thumb {
+        background: var(--got-gold);
+        border-radius: 5px;
+    }
+    
+    .house-filter {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        transition: background 0.3s;
+    }
+    
+    .house-filter:hover {
+        background: rgba(197, 160, 40, 0.2);
+    }
+    
+    .spinner {
+        border: 4px solid rgba(197, 160, 40, 0.3);
+        border-top: 4px solid var(--got-gold);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    #character-panel {
+        animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .panel-title {
+        color: var(--got-gold);
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+        border-bottom: 1px solid var(--got-gold);
+        padding-bottom: 0.5rem;
+    }
+    
+    .panel-info {
+        margin: 0.5rem 0;
+        color: var(--got-silver);
+    }
+    
+    .panel-info strong {
+        color: var(--got-gold);
+        display: inline-block;
+        width: 80px;
+    }
+    
+    .dragon-badge {
+        background: var(--got-dark-red);
+        color: var(--got-gold);
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        display: inline-block;
+        margin-top: 0.5rem;
+        border: 1px solid var(--got-gold);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+// Family Tree Visualization with Real Data
+let currentData = null;
+let svg = null;
+let simulation = null;
+let width, height;
+
+// Character colors by house
+const houseColors = {
+    {% for house in houses %}
+    {{ house.id }}: '{% cycle "#4A0404" "#A5D8FF" "#C5A028" "#8B0000" "#2F4F4F" "#228B22" "#FF6B35" "#666666" %}',
+    {% endfor %}
+};
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    width = document.getElementById('family-graph').clientWidth;
+    height = document.getElementById('family-graph').clientHeight;
+    
+    // Fetch data from API
+    fetchFamilyTreeData();
+    
+    // Setup event listeners
+    document.getElementById('select-all').addEventListener('change', toggleSelectAll);
+    document.getElementById('timeline-slider').addEventListener('input', updateTimelineLabel);
+    document.getElementById('character-search').addEventListener('input', debounce(searchCharacter, 300));
+});
+
+// Fetch data from Django
+function fetchFamilyTreeData() {
+    showLoading(true);
+    
+    fetch('/api/family-tree/')
+        .then(response => response.json())
+        .then(data => {
+            currentData = data;
+            renderTree(data);
+            showLoading(false);
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            // Fallback to sample data if API not ready
+            loadSampleData();
+        });
+}
+
+// Fallback sample data
+function loadSampleData() {
+    currentData = {
+        nodes: [
+            { id: 1, name: 'Aegon I', house: 1, house_name: 'Targaryen', born: '27 BC', died: '37 AC', titles: ['King'], dragon: 'Balerion' },
+            { id: 2, name: 'Rhaenys', house: 1, house_name: 'Targaryen', born: '25 BC', died: '10 AC', titles: ['Queen'], dragon: 'Meraxes' },
+            { id: 3, name: 'Visenya', house: 1, house_name: 'Targaryen', born: '27 BC', died: '44 AC', titles: ['Queen'], dragon: 'Vhagar' },
+            { id: 4, name: 'Aenys I', house: 1, house_name: 'Targaryen', born: '7 AC', died: '42 AC', titles: ['King'], dragon: 'Quicksilver' },
+            { id: 5, name: 'Maegor I', house: 1, house_name: 'Targaryen', born: '12 AC', died: '48 AC', titles: ['King'], dragon: 'Balerion' },
+            { id: 6, name: 'Jaehaerys I', house: 1, house_name: 'Targaryen', born: '34 AC', died: '103 AC', titles: ['King'], dragon: 'Vermithrax' }
+        ],
+        links: [
+            { source: 1, target: 4, type: 'parent' },
+            { source: 1, target: 5, type: 'parent' },
+            { source: 2, target: 4, type: 'parent' },
+            { source: 3, target: 5, type: 'parent' },
+            { source: 4, target: 6, type: 'parent' }
+        ]
+    };
+    renderTree(currentData);
+    showLoading(false);
+}
+
+// Render the tree with D3
+function renderTree(data) {
+    // Clear previous graph
+    d3.select('#family-graph').html('');
+    
+    // Create SVG
+    svg = d3.select('#family-graph')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .call(d3.zoom()
+            .scaleExtent([0.1, 3])
+            .on('zoom', (event) => {
+                container.attr('transform', event.transform);
+            }))
+        .append('g');
+    
+    const container = svg.append('g');
+    
+    // Create force simulation
+    simulation = d3.forceSimulation(data.nodes)
+        .force('link', d3.forceLink(data.links).id(d => d.id).distance(150))
+        .force('charge', d3.forceManyBody().strength(-500))
+        .force('center', d3.forceCenter(width / 2, height / 2))
+        .force('collide', d3.forceCollide().radius(50));
+    
+    // Draw links
+    const link = container.append('g')
+        .selectAll('line')
+        .data(data.links)
+        .enter()
+        .append('line')
+        .attr('class', 'link')
+        .attr('stroke', d => getLinkColor(d.type))
+        .attr('stroke-width', d => getLinkWidth(d.type))
+        .attr('stroke-dasharray', d => d.type === 'marriage' ? '5,5' : null);
+    
+    // Draw nodes
+    const node = container.append('g')
+        .selectAll('g')
+        .data(data.nodes)
+        .enter()
+        .append('g')
+        .attr('class', 'node')
+        .call(d3.drag()
+            .on('start', dragstarted)
+            .on('drag', dragged)
+            .on('end', dragended));
+    
+    // Add circles
+    node.append('circle')
+        .attr('r', d => getNodeSize(d))
+        .attr('fill', d => getHouseColor(d.house))
+        .attr('stroke', d => d.dragon ? '#FFD700' : '#C5A028')
+        .attr('stroke-width', d => d.dragon ? 4 : 2)
+        .on('click', (event, d) => showCharacterDetails(d))
+        .on('mouseover', (event, d) => showTooltip(event, d))
+        .on('mouseout', hideTooltip);
+    
+    // Add text labels
+    node.append('text')
+        .text(d => d.name)
+        .attr('x', 0)
+        .attr('y', d => getNodeSize(d) + 15)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '10px')
+        .style('fill', 'white');
+    
+    // Add dragon rider indicator
+    node.filter(d => d.dragon)
+        .append('text')
+        .text('🐉')
+        .attr('x', -15)
+        .attr('y', -15)
+        .style('font-size', '12px');
+    
+    // Update positions on simulation tick
+    simulation.on('tick', () => {
+        link
+            .attr('x1', d => d.source.x)
+            .attr('y1', d => d.source.y)
+            .attr('x2', d => d.target.x)
+            .attr('y2', d => d.target.y);
+        
+        node
+            .attr('transform', d => `translate(${d.x},${d.y})`);
+    });
+    
+    // Drag functions
+    function dragstarted(event) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        event.subject.fx = event.subject.x;
+        event.subject.fy = event.subject.y;
+    }
+    
+    function dragged(event) {
+        event.subject.fx = event.x;
+        event.subject.fy = event.y;
+    }
+    
+    function dragended(event) {
+        if (!event.active) simulation.alphaTarget(0);
+        event.subject.fx = null;
+        event.subject.fy = null;
+    }
+}
+
+// Helper functions
+function getHouseColor(houseId) {
+    return houseColors[houseId] || '#666666';
+}
+
+function getLinkColor(type) {
+    const colors = {
+        'parent': '#C5A028',
+        'marriage': '#FFD700',
+        'sibling': '#A5D8FF'
+    };
+    return colors[type] || '#666666';
+}
+
+function getLinkWidth(type) {
+    const widths = {
+        'parent': 3,
+        'marriage': 2,
+        'sibling': 1.5
+    };
+    return widths[type] || 1;
+}
+
+function getNodeSize(node) {
+    let size = 20;
+    if (node.titles && node.titles.length > 0) size += 5;
+    if (node.dragon) size += 5;
+    return size;
+}
+
+function showTooltip(event, d) {
+    const tooltip = d3.select('#tooltip');
+    tooltip.style('display', 'block')
+        .style('left', (event.pageX + 10) + 'px')
+        .style('top', (event.pageY - 10) + 'px')
+        .html(`
+            <strong style="color: var(--got-gold);">${d.name}</strong><br>
+            House: ${d.house_name || 'Unknown'}<br>
+            ${d.born ? `Born: ${d.born}<br>` : ''}
+            ${d.dragon ? `🐉 Dragon: ${d.dragon}` : ''}
+        `);
+}
+
+function hideTooltip() {
+    d3.select('#tooltip').style('display', 'none');
+}
+
+function showCharacterDetails(character) {
+    const panel = document.getElementById('character-panel');
+    const content = document.getElementById('panel-content');
+    
+    let html = `
+        <h3 class="panel-title">${character.name}</h3>
+        <div class="panel-info"><strong>House:</strong> ${character.house_name || 'Unknown'}</div>
+        ${character.born ? `<div class="panel-info"><strong>Born:</strong> ${character.born}</div>` : ''}
+        ${character.died ? `<div class="panel-info"><strong>Died:</strong> ${character.died}</div>` : ''}
+        ${character.culture ? `<div class="panel-info"><strong>Culture:</strong> ${character.culture}</div>` : ''}
+    `;
+    
+    if (character.titles && character.titles.length > 0) {
+        html += `<div class="panel-info"><strong>Titles:</strong><br>`;
+        character.titles.slice(0, 3).forEach(title => {
+            html += `- ${title}<br>`;
+        });
+        if (character.titles.length > 3) html += `...`;
+        html += `</div>`;
+    }
+    
+    if (character.dragon) {
+        html += `<div class="dragon-badge">🐉 Dragon Rider: ${character.dragon}</div>`;
+    }
+    
+    content.innerHTML = html;
+    panel.style.display = 'block';
+}
+
+function closePanel() {
+    document.getElementById('character-panel').style.display = 'none';
+}
+
+function applyFilters() {
+    const selectedHouses = [];
+    document.querySelectorAll('.house-checkbox:checked').forEach(cb => {
+        if (cb.value !== 'all') {
+            selectedHouses.push(parseInt(cb.value));
+        }
+    });
+    
+    const showParent = document.getElementById('show-parent').checked;
+    const showMarriage = document.getElementById('show-marriage').checked;
+    const showSibling = document.getElementById('show-sibling').checked;
+    
+    // Filter nodes
+    const filteredNodes = currentData.nodes.filter(node => 
+        selectedHouses.includes(node.house)
+    );
+    
+    // Filter links based on types and nodes
+    const nodeIds = new Set(filteredNodes.map(n => n.id));
+    const filteredLinks = currentData.links.filter(link => {
+        if (!showParent && link.type === 'parent') return false;
+        if (!showMarriage && link.type === 'marriage') return false;
+        if (!showSibling && link.type === 'sibling') return false;
+        return nodeIds.has(link.source.id || link.source) && 
+               nodeIds.has(link.target.id || link.target);
+    });
+    
+    // Re-render with filtered data
+    renderTree({
+        nodes: filteredNodes,
+        links: filteredLinks
+    });
+}
+
+function toggleSelectAll(event) {
+    const checkboxes = document.querySelectorAll('.house-checkbox');
+    checkboxes.forEach(cb => {
+        if (cb.value !== 'all') {
+            cb.checked = event.target.checked;
+        }
+    });
+    applyFilters();
+}
+
+function updateTimelineLabel(event) {
+    const value = parseInt(event.target.value);
+    let label;
+    if (value < 0) {
+        label = Math.abs(value) + ' BC';
+    } else {
+        label = value + ' AC';
+    }
+    document.getElementById('timeline-value').textContent = label;
+    
+    // Filter by birth/death years
+    filterByTimeline(value);
+}
+
+function filterByTimeline(year) {
+    if (!currentData) return;
+    
+    const filteredNodes = currentData.nodes.filter(node => {
+        // Parse birth year
+        let birthYear = parseYear(node.born);
+        let deathYear = parseYear(node.died);
+        
+        // If no dates, show character
+        if (!birthYear && !deathYear) return true;
+        
+        // Check if character was alive at this year
+        if (birthYear && deathYear) {
+            return year >= birthYear && year <= deathYear;
+        } else if (birthYear) {
+            return year >= birthYear;
+        } else if (deathYear) {
+            return year <= deathYear;
+        }
+        return true;
+    });
+    
+    const nodeIds = new Set(filteredNodes.map(n => n.id));
+    const filteredLinks = currentData.links.filter(link =>
+        nodeIds.has(link.source.id || link.source) && 
+        nodeIds.has(link.target.id || link.target)
+    );
+    
+    renderTree({
+        nodes: filteredNodes,
+        links: filteredLinks
+    });
+}
+
+function parseYear(yearStr) {
+    if (!yearStr) return null;
+    yearStr = yearStr.toString();
+    if (yearStr.includes('BC')) {
+        return -parseInt(yearStr);
+    } else if (yearStr.includes('AC')) {
+        return parseInt(yearStr);
+    }
+    return null;
+}
+
+function searchCharacter(event) {
+    const query = event.target.value.toLowerCase();
+    if (!currentData || !query) {
+        applyFilters();
+        return;
+    }
+    
+    const filteredNodes = currentData.nodes.filter(node =>
+        node.name.toLowerCase().includes(query)
+    );
+    
+    const nodeIds = new Set(filteredNodes.map(n => n.id));
+    const filteredLinks = currentData.links.filter(link =>
+        nodeIds.has(link.source.id || link.source) && 
+        nodeIds.has(link.target.id || link.target)
+    );
+    
+    renderTree({
+        nodes: filteredNodes,
+        links: filteredLinks
+    });
+}
+
+function resetView() {
+    // Reset filters
+    document.querySelectorAll('.house-checkbox').forEach(cb => {
+        cb.checked = true;
+    });
+    document.getElementById('show-parent').checked = true;
+    document.getElementById('show-marriage').checked = true;
+    document.getElementById('show-sibling').checked = true;
+    document.getElementById('timeline-slider').value = 305;
+    document.getElementById('timeline-value').textContent = '305 AC';
+    document.getElementById('character-search').value = '';
+    
+    // Reset to original data
+    if (currentData) {
+        renderTree(currentData);
+    }
+}
+
+function showLoading(show) {
+    document.getElementById('loading-spinner').style.display = show ? 'block' : 'none';
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Export functions for HTML buttons
+window.applyFilters = applyFilters;
+window.resetView = resetView;
+window.closePanel = closePanel;
+</script>
+{% endblock %}

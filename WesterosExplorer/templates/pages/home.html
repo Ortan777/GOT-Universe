@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 class="got-quote">
+            "When you play the game of thrones,<br>
+            you win or you die.<br>
+            There is no middle ground."
+        </h1>
+        <p class="quote-author">— Cersei Lannister</p>
+        
+        <!-- Featured Characters -->
+        <div class="featured-characters">
+            {% for character in featured_characters %}
+            <div class="character-card" onclick="viewCharacter('{{ character.name|slugify }}')">
+                <img src="{% static 'images/characters/'|add:character.image %}" 
+                     alt="{{ character.name }}"
+                     onerror="this.src='https://via.placeholder.com/250x300?text={{ character.name }}'">
+                <p>"{{ character.quote }}"</p>
+                <small>{{ character.name }}</small>
+                <small style="color: var(--got-gold);">{{ character.house }}</small>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Seasons Badge -->
+        <div class="seasons-badge">
+            <span>EXPLORE THE REALM</span>
+            <div class="badge-icons">
+                <i class="fas fa-dragon"></i> 
+                <i class="fas fa-crown"></i> 
+                <i class="fas fa-shield-alt"></i>
+            </div>
+        </div>
+        
+        <!-- CTA Buttons -->
+        <div class="cta-buttons">
+            <button class="btn-primary" onclick="exploreMap()">
+                <i class="fas fa-map"></i> Explore the Realm
+            </button>
+            <button class="btn-secondary" onclick="viewFamilyTree()">
+                <i class="fas fa-tree"></i> View Family Trees
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function viewCharacter(characterSlug) {
+    alert('Character details for ' + characterSlug + ' - Coming soon!');
+    // window.location.href = '/characters/' + characterSlug + '/';
+}
+
+function exploreMap() {
+    alert('Interactive map coming soon!');
+    // window.location.href = '/map/';
+}
+
+function viewFamilyTree() {
+    window.location.href = '{% url "family_tree" %}';
+}
+</script>
+{% endblock %}

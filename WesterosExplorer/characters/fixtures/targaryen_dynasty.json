@@ -1,0 +1,288 @@
+[
+  {
+    "model": "characters.house",
+    "pk": 1,
+    "fields": {
+      "name": "Targaryen",
+      "sigil": "Three-headed dragon, red on black",
+      "words": "Fire and Blood",
+      "seat": "Dragonstone (later King's Landing)",
+      "region": "Crownlands",
+      "founded": "House of the Dragon",
+      "extinct": ""
+    }
+  },
+  {
+    "model": "characters.house",
+    "pk": 2,
+    "fields": {
+      "name": "Stark",
+      "sigil": "A grey direwolf on a white field",
+      "words": "Winter is Coming",
+      "seat": "Winterfell",
+      "region": "The North",
+      "founded": "Age of Heroes",
+      "extinct": ""
+    }
+  },
+  {
+    "model": "characters.house",
+    "pk": 3,
+    "fields": {
+      "name": "Lannister",
+      "sigil": "A golden lion on a crimson field",
+      "words": "Hear Me Roar!",
+      "seat": "Casterly Rock",
+      "region": "The Westerlands",
+      "founded": "Age of Heroes",
+      "extinct": ""
+    }
+  },
+  {
+    "model": "characters.character",
+    "pk": 1,
+    "fields": {
+      "name": "Aegon I Targaryen",
+      "also_known_as": ["Aegon the Conqueror", "Aegon the Dragon"],
+      "house": 1,
+      "father": null,
+      "mother": null,
+      "spouse": [2, 3],
+      "born": "27 BC",
+      "died": "37 AC",
+      "gender": "M",
+      "culture": "Valyrian",
+      "titles": ["King of the Andals, the Rhoynar, and the First Men", "Lord of the Seven Kingdoms", "Lord of Dragonstone"],
+      "dragon": "Balerion",
+      "image": ""
+    }
+  },
+  {
+    "model": "characters.character",
+    "pk": 2,
+    "fields": {
+      "name": "Rhaenys Targaryen",
+      "also_known_as": [],
+      "house": 1,
+      "father": null,
+      "mother": null,
+      "spouse": [1],
+      "born": "25 BC",
+      "died": "10 AC",
+      "gender": "F",
+      "culture": "Valyrian",
+      "titles": ["Queen of the Seven Kingdoms"],
+      "dragon": "Meraxes",
+      "image": ""
+    }
+  },
+  {
+    "model": "characters.character",
+    "pk": 3,
+    "fields": {
+      "name": "Visenya Targaryen",
+      "also_known_as": [],
+      "house": 1,
+      "father": null,
+      "mother": null,
+      "spouse": [1],
+      "born": "27 BC",
+      "died": "44 AC",
+      "gender": "F",
+      "culture": "Valyrian",
+      "titles": ["Queen of the Seven Kingdoms"],
+      "dragon": "Vhagar",
+      "image": ""
+    }
+  },
+  {
+    "model": "characters.character",
+    "pk": 4,
+    "fields": {
+      "name": "Aenys I Targaryen",
+      "also_known_as": [],
+      "house": 1,
+      "father": 1,
+      "mother": 2,
+      "spouse": [5],
+      "born": "7 AC",
+      "died": "42 AC",
+      "gender": "M",
+      "culture": "Valyrian",
+      "titles": ["King of the Andals, the Rhoynar, and the First Men", "Lord of the Seven Kingdoms"],
+      "dragon": "Quicksilver",
+      "image": ""
+    }
+  },
+  {
+    "model": "characters.character",
+    "pk": 5,
+    "fields": {
+      "name": "Alyssa Velaryon",
+      "also_known_as": [],
+      "house": null,
+      "father": null,
+      "mother": null,
+      "spouse": [4],
+      "born": "6 AC",
+      "died": "42 AC",
+      "gender": "F",
+      "culture": "Valyrian",
+      "titles": ["Queen Consort"],
+      "dragon": "",
+      "image": ""
+    }
+  },
+  {
+    "model": "characters.character",
+    "pk": 6,
+    "fields": {
+      "name": "Maegor I Targaryen",
+      "also_known_as": ["Maegor the Cruel"],
+      "house": 1,
+      "father": 1,
+      "mother": 3,
+      "spouse": [],
+      "born": "12 AC",
+      "died": "48 AC",
+      "gender": "M",
+      "culture": "Valyrian",
+      "titles": ["King of the Andals, the Rhoynar, and the First Men", "Lord of the Seven Kingdoms"],
+      "dragon": "Balerion",
+      "image": ""
+    }
+  },
+  {
+    "model": "characters.character",
+    "pk": 7,
+    "fields": {
+      "name": "Jaehaerys I Targaryen",
+      "also_known_as": ["Jaehaerys the Conciliator", "The Old King"],
+      "house": 1,
+      "father": 4,
+      "mother": 5,
+      "spouse": [8],
+      "born": "34 AC",
+      "died": "103 AC",
+      "gender": "M",
+      "culture": "Valyrian",
+      "titles": ["King of the Andals, the Rhoynar, and the First Men", "Lord of the Seven Kingdoms"],
+      "dragon": "Vermithrax",
+      "image": ""
+    }
+  },
+  {
+    "model": "characters.character",
+    "pk": 8,
+    "fields": {
+      "name": "Alysanne Targaryen",
+      "also_known_as": ["Good Queen Alysanne"],
+      "house": 1,
+      "father": 4,
+      "mother": 5,
+      "spouse": [7],
+      "born": "36 AC",
+      "died": "100 AC",
+      "gender": "F",
+      "culture": "Valyrian",
+      "titles": ["Queen Consort"],
+      "dragon": "Silverwing",
+      "image": ""
+    }
+  },
+  {
+    "model": "characters.character",
+    "pk": 9,
+    "fields": {
+      "name": "Viserys I Targaryen",
+      "also_known_as": [],
+      "house": 1,
+      "father": null,
+      "mother": null,
+      "spouse": [],
+      "born": "77 AC",
+      "died": "129 AC",
+      "gender": "M",
+      "culture": "Valyrian",
+      "titles": ["King of the Andals, the Rhoynar, and the First Men", "Lord of the Seven Kingdoms"],
+      "dragon": "Balerion",
+      "image": ""
+    }
+  },
+  {
+    "model": "characters.character",
+    "pk": 10,
+    "fields": {
+      "name": "Rhaenyra Targaryen",
+      "also_known_as": ["The Realm's Delight"],
+      "house": 1,
+      "father": 9,
+      "mother": null,
+      "spouse": [],
+      "born": "97 AC",
+      "died": "130 AC",
+      "gender": "F",
+      "culture": "Valyrian",
+      "titles": ["Queen of the Seven Kingdoms"],
+      "dragon": "Syrax",
+      "image": ""
+    }
+  },
+  {
+    "model": "characters.character",
+    "pk": 11,
+    "fields": {
+      "name": "Daenerys Targaryen",
+      "also_known_as": ["Daenerys Stormborn", "The Unburnt", "Mother of Dragons", "Khaleesi", "Mhysa", "Breaker of Chains"],
+      "house": 1,
+      "father": null,
+      "mother": null,
+      "spouse": [],
+      "born": "284 AC",
+      "died": "305 AC",
+      "gender": "F",
+      "culture": "Valyrian",
+      "titles": ["Queen of the Andals, the Rhoynar, and the First Men", "Protector of the Seven Kingdoms", "Khaleesi of the Great Grass Sea", "Queen of Meereen"],
+      "dragon": "Drogon, Rhaegal, Viserion",
+      "image": ""
+    }
+  },
+  {
+    "model": "characters.character",
+    "pk": 12,
+    "fields": {
+      "name": "Jon Snow",
+      "also_known_as": ["Lord Snow", "The Bastard of Winterfell", "King in the North", "The White Wolf"],
+      "house": 2,
+      "father": null,
+      "mother": null,
+      "spouse": [],
+      "born": "283 AC",
+      "died": "302 AC (resurrected)",
+      "gender": "M",
+      "culture": "Northmen",
+      "titles": ["Lord Commander of the Night's Watch", "King in the North"],
+      "dragon": "",
+      "image": ""
+    }
+  },
+  {
+    "model": "characters.character",
+    "pk": 13,
+    "fields": {
+      "name": "Tyrion Lannister",
+      "also_known_as": ["The Imp", "The Halfman", "Hugor Hill", "Yollo"],
+      "house": 3,
+      "father": null,
+      "mother": null,
+      "spouse": [],
+      "born": "273 AC",
+      "died": "",
+      "gender": "M",
+      "culture": "Westerman",
+      "titles": ["Lord of Casterly Rock", "Master of Coin", "Hand of the King"],
+      "dragon": "",
+      "image": ""
+    }
+  }
+]

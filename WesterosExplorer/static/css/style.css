@@ -1,0 +1,315 @@
+:root {
+    --got-black: #0A0A0A;
+    --got-dark-red: #4A0404;
+    --got-gold: #C5A028;
+    --got-blood: #8B0000;
+    --got-ice: #A5D8FF;
+    --got-silver: #E8E8E8;
+    --got-overlay: rgba(0, 0, 0, 0.85);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Cormorant Garamond', serif;
+    background-color: var(--got-black);
+    color: var(--got-silver);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+/* Navigation */
+.navbar {
+    background: linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.8));
+    padding: 1rem 2rem;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 2px solid var(--got-gold);
+    backdrop-filter: blur(10px);
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.logo {
+    font-family: 'Cinzel', serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--got-gold);
+    text-decoration: none;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(197, 160, 40, 0.5);
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 2.5rem;
+}
+
+.nav-menu a {
+    color: var(--got-silver);
+    text-decoration: none;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.nav-menu a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--got-gold);
+    transition: width 0.3s;
+}
+
+.nav-menu a:hover {
+    color: var(--got-gold);
+}
+
+.nav-menu a:hover::after {
+    width: 100%;
+}
+
+.btn-signin {
+    background: transparent;
+    border: 2px solid var(--got-gold);
+    color: var(--got-gold);
+    padding: 0.5rem 2rem;
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 4px;
+}
+
+.btn-signin:hover {
+    background: var(--got-gold);
+    color: var(--got-black);
+    box-shadow: 0 0 20px rgba(197, 160, 40, 0.5);
+}
+
+/* Hero Section */
+.hero-section {
+    height: 100vh;
+    background: linear-gradient(var(--got-overlay), var(--got-overlay)),
+                url('/static/images/backgrounds/iron-throne.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+}
+
+.hero-content {
+    max-width: 1000px;
+    padding: 2rem;
+    animation: fadeIn 2s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.got-quote {
+    font-size: 4rem;
+    font-weight: 900;
+    color: var(--got-gold);
+    text-shadow: 0 0 30px rgba(197, 160, 40, 0.5);
+    margin-bottom: 1rem;
+    line-height: 1.2;
+    font-family: 'Cinzel', serif;
+}
+
+.quote-author {
+    font-size: 1.5rem;
+    color: var(--got-silver);
+    margin-bottom: 3rem;
+    font-style: italic;
+}
+
+/* Character Cards */
+.featured-characters {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin: 4rem 0;
+    flex-wrap: wrap;
+}
+
+.character-card {
+    width: 250px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.character-card:hover {
+    transform: translateY(-20px);
+}
+
+.character-card::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    background: linear-gradient(45deg, var(--got-gold), transparent);
+    border-radius: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: -1;
+}
+
+.character-card:hover::before {
+    opacity: 0.3;
+}
+
+.character-card img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border: 3px solid var(--got-gold);
+    border-radius: 12px;
+    box-shadow: 0 0 30px rgba(197, 160, 40, 0.3);
+    transition: all 0.3s;
+}
+
+.character-card:hover img {
+    box-shadow: 0 0 50px rgba(197, 160, 40, 0.6);
+}
+
+.character-card p {
+    margin-top: 1rem;
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--got-gold);
+}
+
+.character-card small {
+    display: block;
+    color: var(--got-silver);
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+/* Seasons Badge */
+.seasons-badge {
+    margin: 3rem 0;
+}
+
+.seasons-badge span {
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    color: var(--got-gold);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.badge-icons {
+    font-size: 2rem;
+    letter-spacing: 10px;
+}
+
+/* CTA Buttons */
+.cta-buttons {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    margin-top: 3rem;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 1rem 3rem;
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 4px;
+}
+
+.btn-primary {
+    background: var(--got-gold);
+    color: var(--got-black);
+    border: 2px solid var(--got-gold);
+}
+
+.btn-primary:hover {
+    background: transparent;
+    color: var(--got-gold);
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(197, 160, 40, 0.5);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--got-gold);
+    border: 2px solid var(--got-gold);
+}
+
+.btn-secondary:hover {
+    background: var(--got-gold);
+    color: var(--got-black);
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(197, 160, 40, 0.5);
+}
+
+/* Footer */
+.footer {
+    background: rgba(0,0,0,0.9);
+    padding: 2rem;
+    text-align: center;
+    border-top: 1px solid var(--got-gold);
+    color: var(--got-silver);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .got-quote {
+        font-size: 2.5rem;
+    }
+    
+    .nav-menu {
+        display: none;
+    }
+    
+    .featured-characters {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+}

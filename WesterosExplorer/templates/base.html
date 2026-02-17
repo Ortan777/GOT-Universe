@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Westeros Explorer - Game of Thrones Universe</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <i class="fas fa-dragon"></i> WESTEROS EXPLORER
+            </a>
+            <ul class="nav-menu">
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="#">Characters</a></li>
+                <li><a href="#">Houses</a></li>
+                <li><a href="#">Map</a></li>
+                <li><a href="{% url 'family_tree' %}">Family Tree</a></li>
+            </ul>
+            <div class="nav-right">
+                <button class="btn-signin">
+                    <i class="fas fa-user"></i> SIGN IN
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2024 Westeros Explorer - A Game of Thrones Universe</p>
+        <p style="margin-top: 1rem; font-size: 0.9rem;">
+            <i class="fas fa-dragon"></i> Fire and Blood <i class="fas fa-wolf"></i> Winter is Coming
+        </p>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
