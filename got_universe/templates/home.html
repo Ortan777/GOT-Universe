@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 class="text-4xl font-bold text-red-400 mb-10">
+    Westeros Intelligence Dashboard
+</h2>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+
+    <div class="bg-gray-800 p-6 rounded-lg text-center">
+        <p class="text-gray-400">Total Characters</p>
+        <p class="text-3xl font-bold text-yellow-400">
+            {{ total_characters }}
+        </p>
+    </div>
+
+    <div class="bg-gray-800 p-6 rounded-lg text-center">
+        <p class="text-gray-400">Total Houses</p>
+        <p class="text-3xl font-bold text-yellow-400">
+            {{ total_houses }}
+        </p>
+    </div>
+
+    <div class="bg-gray-800 p-6 rounded-lg text-center">
+        <p class="text-gray-400">Total Events</p>
+        <p class="text-3xl font-bold text-yellow-400">
+            {{ total_events }}
+        </p>
+    </div>
+
+</div>
+
+<!-- Highlight Section -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+    <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+        <h3 class="text-2xl font-semibold text-yellow-400 mb-4">
+            Most Influential Character
+        </h3>
+
+        {% if most_influential_character %}
+            <p class="text-xl">
+                {{ most_influential_character.name }}
+            </p>
+            <a href="/characters/{{ most_influential_character.id }}/"
+               class="text-blue-400 hover:underline">
+                View Profile →
+            </a>
+        {% else %}
+            <p>No data available.</p>
+        {% endif %}
+    </div>
+
+    <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+        <h3 class="text-2xl font-semibold text-red-400 mb-4">
+            Most Powerful House
+        </h3>
+
+        {% if most_powerful_house %}
+            <p class="text-xl">
+                {{ most_powerful_house.name }}
+            </p>
+            <a href="/houses/{{ most_powerful_house.id }}/"
+               class="text-blue-400 hover:underline">
+                View House →
+            </a>
+        {% else %}
+            <p>No data available.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 class="text-2xl font-semibold mb-4">All Characters</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for character in characters %}
+        <div class="bg-gray-800 p-4 rounded-lg shadow-lg hover:shadow-red-500/30 transition">
+
+            <h3 class="text-xl font-bold text-yellow-400">
+                <a href="{% url 'character_detail' character.id %}">
+                    {{ character.name }}
+                </a>
+            </h3>
+
+            <p class="mt-2 text-gray-400">
+                House: {{ character.house }}
+            </p>
+
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

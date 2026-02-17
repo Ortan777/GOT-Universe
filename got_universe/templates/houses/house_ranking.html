@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 class="text-3xl font-bold text-red-400 mb-6">
+    House Power Ranking
+</h2>
+
+<div class="space-y-4">
+
+    {% for house in ranked %}
+        <div class="bg-gray-800 p-4 rounded flex justify-between items-center">
+            <div>
+                <span class="text-yellow-400 font-semibold">
+                    {{ forloop.counter }}.
+                </span>
+                {{ house.name }}
+            </div>
+            <div class="text-red-400 font-bold">
+                Power Score: {{ house.power_score|floatformat:4 }}
+            </div>
+        </div>
+    {% endfor %}
+
+</div>
+
+{% endblock %}

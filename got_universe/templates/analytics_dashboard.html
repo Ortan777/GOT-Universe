@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 class="text-4xl font-bold text-red-400 mb-10">
+    Political Analytics Dashboard
+</h2>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+    <!-- Character Chart -->
+    <div class="bg-gray-800 p-6 rounded-lg">
+        <h3 class="text-2xl text-yellow-400 mb-4">
+            Top 5 Influential Characters
+        </h3>
+        <canvas id="characterChart"></canvas>
+    </div>
+
+    <!-- House Chart -->
+    <div class="bg-gray-800 p-6 rounded-lg">
+        <h3 class="text-2xl text-red-400 mb-4">
+            House Power Ranking
+        </h3>
+        <canvas id="houseChart"></canvas>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const charData = {{ char_data|safe }};
+    const houseData = {{ house_data|safe }};
+
+    const charCtx = document.getElementById('characterChart');
+
+    new Chart(charCtx, {
+        type: 'bar',
+        data: {
+            labels: charData.map(c => c.name),
+            datasets: [{
+                label: 'Influence Score',
+                data: charData.map(c => c.score),
+                backgroundColor: 'rgba(234, 179, 8, 0.6)'
+            }]
+        }
+    });
+
+    const houseCtx = document.getElementById('houseChart');
+
+    new Chart(houseCtx, {
+        type: 'bar',
+        data: {
+            labels: houseData.map(h => h.name),
+            datasets: [{
+                label: 'House Power Score',
+                data: houseData.map(h => h.score),
+                backgroundColor: 'rgba(239, 68, 68, 0.6)'
+            }]
+        }
+    });
+</script>
+
+{% endblock %}
