@@ -9,8 +9,11 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:wght@300;400;600;700&display=swap" rel="stylesheet">
     
-    <!-- Font Awesome for icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Leaflet Map (if needed) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -21,39 +24,74 @@
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="/" class="logo">
+            <a href="{% url 'home' %}" class="logo">
                 <i class="fas fa-dragon"></i> WESTEROS EXPLORER
             </a>
             <ul class="nav-menu">
                 <li><a href="{% url 'home' %}">Home</a></li>
-                <li><a href="#">Characters</a></li>
-                <li><a href="#">Houses</a></li>
-                <li><a href="#">Map</a></li>
+                <li><a href="{% url 'character_list' %}">Characters</a></li>
+                <li><a href="{% url 'house_list' %}">Houses</a></li>
+                <li><a href="{% url 'map_view' %}">Map</a></li>
                 <li><a href="{% url 'family_tree' %}">Family Tree</a></li>
             </ul>
             <div class="nav-right">
-                <button class="btn-signin">
+                <button class="btn-signin" onclick="toggleSignIn()">
                     <i class="fas fa-user"></i> SIGN IN
                 </button>
             </div>
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
     </nav>
 
     <!-- Main Content -->
     <main>
-        {% block content %}{% endblock %}
+        {% block content %}
+        <!-- Child templates will insert content here -->
+        {% endblock content %}
     </main>
 
     <!-- Footer -->
     <footer class="footer">
         <p>© 2024 Westeros Explorer - A Game of Thrones Universe</p>
         <p style="margin-top: 1rem; font-size: 0.9rem;">
-            <i class="fas fa-dragon"></i> Fire and Blood <i class="fas fa-wolf"></i> Winter is Coming
+            <i class="fas fa-dragon"></i> Fire and Blood 
+            <i class="fas fa-wolf"></i> Winter is Coming
         </p>
     </footer>
 
-    <!-- JavaScript -->
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Custom JavaScript -->
     <script src="{% static 'js/main.js' %}"></script>
-    {% block extra_js %}{% endblock %}
+    
+    <!-- Mobile Menu JavaScript -->
+    <script>
+        function toggleMobileMenu() {
+            const navMenu = document.querySelector('.nav-menu');
+            navMenu.classList.toggle('active');
+        }
+        
+        function toggleSignIn() {
+            alert('Sign in functionality coming soon!');
+        }
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const navMenu = document.querySelector('.nav-menu');
+            const mobileBtn = document.querySelector('.mobile-menu-btn');
+            
+            if (navMenu && mobileBtn && !navMenu.contains(event.target) && !mobileBtn.contains(event.target)) {
+                navMenu.classList.remove('active');
+            }
+        });
+    </script>
+    
+    <!-- Child template JavaScript block -->
+    {% block extra_js %}{% endblock extra_js %}
 </body>
 </html>

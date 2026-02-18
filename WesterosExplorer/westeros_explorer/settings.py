@@ -32,8 +32,8 @@ INSTALLED_APPS = [
     'core',
     'characters',
     'houses',
-    'map',
     'timeline',
+    'map',
 ]
 
 MIDDLEWARE = [

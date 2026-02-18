@@ -1,0 +1,61 @@
+/* House Banner Styles */
+.house-banner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.house-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%);
+    z-index: 1;
+}
+
+.house-banner-icon {
+    font-size: 5rem;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+}
+
+.house-banner-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: white;
+    background: rgba(0,0,0,0.7);
+    padding: 0.25rem 1rem;
+    border-radius: 20px;
+    border: 1px solid gold;
+    position: relative;
+    z-index: 2;
+}
+
+/* House-specific colors */
+.house-targaryen { background: linear-gradient(135deg, #4A0404, #220000); }
+.house-stark { background: linear-gradient(135deg, #2C3E50, #1a2632); }
+.house-lannister { background: linear-gradient(135deg, #C5A028, #8B6910); }
+.house-baratheon { background: linear-gradient(135deg, #8B0000, #4d0000); }
+.house-greyjoy { background: linear-gradient(135deg, #2F4F4F, #1c2f2f); }
+.house-tyrell { background: linear-gradient(135deg, #228B22, #0e3b0e); }
+.house-martell { background: linear-gradient(135deg, #FF6B35, #b33c1a); }
+.house-tully { background: linear-gradient(135deg, #1E4D6E, #102b3d); }
+.house-arryn { background: linear-gradient(135deg, #87CEEB, #4b8da3); }
+.house-bolton { background: linear-gradient(135deg, #8B0000, #4d0000); }
+.house-frey { background: linear-gradient(135deg, #6B4F3C, #3d2e22); }
+.house-mormont { background: linear-gradient(135deg, #2F4F4F, #1c2f2f); }
+.house-velaryon { background: linear-gradient(135deg, #1E4D6E, #0f2e41); }
+.house-hightower { background: linear-gradient(135deg, #8B4513, #4d260b); }
+.house-dayne { background: linear-gradient(135deg, #4A4A4A, #2a2a2a); }
+.house-tarly { background: linear-gradient(135deg, #006400, #003000); }
+.house-clegane { background: linear-gradient(135deg, #4A4A4A, #2a2a2a); }

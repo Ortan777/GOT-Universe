@@ -10,9 +10,9 @@ urlpatterns = [
     path('', include('core.urls')),
     path('characters/', include('characters.urls')),
     path('houses/', include('houses.urls')),
-    path('map/', include('map.urls')),
+    path('map/', include('map.urls')),  # This should be here
     path('timeline/', include('timeline.urls')),
-    path('api/', include('characters.urls_api')),  # Add this line
+    path('api/', include('characters.urls_api')),
 ]
 
 if settings.DEBUG:
