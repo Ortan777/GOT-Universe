@@ -34,9 +34,21 @@ class FamilyTreeView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Get all houses with member counts
-        houses = House.objects.all().order_by('name')
-        for house in houses:
-            house.member_count = Character.objects.filter(house=house).count()
+        # Get ONLY houses that have at least one character
+        houses = []
+        all_houses = House.objects.all().order_by('name')
+        
+        for house in all_houses:
+            member_count = Character.objects.filter(house=house).count()
+            if member_count > 0:
+                house.member_count = member_count
+                houses.append(house)
+        
         context['houses'] = houses
+        context['total_houses_with_members'] = len(houses)
+        context['total_houses'] = House.objects.count()
+        
         return context
+
+class TestCardsView(TemplateView):
+    template_name = 'pages/test_cards.html'

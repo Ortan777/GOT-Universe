@@ -1,9 +1,132 @@
+<!-- templates/map/index.html -->
 {% extends 'base.html' %}
 {% load static %}
 
 {% block content %}
-<div style="padding: 100px 2rem 2rem 2rem;">
-    <h1 style="color: var(--got-gold); text-align: center;">{{ title }}</h1>
-    <p style="text-align: center; margin-top: 2rem;">Interactive map coming soon...</p>
+<div class="map-page-container" style="padding: 80px 0 0 0; height: calc(100vh - 80px);">
+    <div class="map-header" style="text-align: center; padding: 1rem; background: rgba(0,0,0,0.7); border-bottom: 2px solid var(--got-gold);">
+        <h1 style="color: var(--got-gold);">
+            <i class="fas fa-map"></i> Map of Westeros & Essos
+        </h1>
+        <p style="color: var(--got-silver);">Click on any location to learn more</p>
+    </div>
+    
+    <!-- Simple Map Container -->
+    <div id="got-map" style="width: 100%; height: calc(100% - 80px); background: #1a1a1a; position: relative;">
+        <!-- Map will be loaded here -->
+        <img src="{% static 'images/map/westeros-essos-full.jpg' %}" 
+             alt="Map of Westeros and Essos"
+             style="width: 100%; height: 100%; object-fit: contain; cursor: pointer;"
+             id="main-map-image"
+             usemap="#got-map-regions">
+        
+        <!-- Simple clickable regions (you'll need to add coordinates) -->
+        <map name="got-map-regions">
+            <!-- These coordinates are examples - you'll need actual ones -->
+            <area shape="circle" coords="800,400,20" alt="Winterfell" title="Winterfell" 
+                  onclick="showLocationInfo('Winterfell', 'Stark', 'The North')">
+            <area shape="circle" coords="950,600,15" alt="King's Landing" title="King's Landing"
+                  onclick="showLocationInfo('King\'s Landing', 'Baratheon/Lannister/Targaryen', 'Crownlands')">
+            <area shape="circle" coords="700,200,20" alt="The Wall" title="The Wall"
+                  onclick="showLocationInfo('The Wall', 'Night\'s Watch', 'The North')">
+            <area shape="circle" coords="600,550,15" alt="Dragonstone" title="Dragonstone"
+                  onclick="showLocationInfo('Dragonstone', 'Targaryen', 'Crownlands')">
+            <area shape="circle" coords="500,650,15" alt="Highgarden" title="Highgarden"
+                  onclick="showLocationInfo('Highgarden', 'Tyrell', 'The Reach')">
+            <area shape="circle" coords="1100,450,15" alt="Sunspear" title="Sunspear"
+                  onclick="showLocationInfo('Sunspear', 'Martell', 'Dorne')">
+            <area shape="circle" coords="300,450,15" alt="Pyke" title="Pyke"
+                  onclick="showLocationInfo('Pyke', 'Greyjoy', 'Iron Islands')">
+            <area shape="circle" coords="850,300,15" alt="Riverrun" title="Riverrun"
+                  onclick="showLocationInfo('Riverrun', 'Tully', 'Riverlands')">
+            <area shape="circle" coords="750,250,15" alt="The Eyrie" title="The Eyrie"
+                  onclick="showLocationInfo('The Eyrie', 'Arryn', 'The Vale')">
+            <area shape="circle" coords="1000,700,20" alt="Volantis" title="Volantis"
+                  onclick="showLocationInfo('Volantis', 'Free City', 'Essos')">
+            <area shape="circle" coords="1200,500,20" alt="Meereen" title="Meereen"
+                  onclick="showLocationInfo('Meereen', 'Slave City', 'Slaver\'s Bay')">
+        </map>
+    </div>
+    
+    <!-- Simple Info Panel (appears when clicking) -->
+    <div id="location-info-panel" style="position: fixed; bottom: 20px; right: 20px; width: 300px; 
+                background: rgba(0,0,0,0.9); border: 2px solid var(--got-gold); 
+                border-radius: 8px; padding: 1rem; display: none; z-index: 1000;">
+        <button onclick="closeInfoPanel()" style="position: absolute; top: 5px; right: 5px; 
+                background: none; border: none; color: var(--got-gold); font-size: 1.2rem; cursor: pointer;">✖</button>
+        <div id="info-content"></div>
+    </div>
 </div>
+
+<script>
+function showLocationInfo(location, house, region) {
+    const panel = document.getElementById('location-info-panel');
+    const content = document.getElementById('info-content');
+    
+    // Here you could fetch data from your database
+    content.innerHTML = `
+        <h3 style="color: var(--got-gold); margin-bottom: 0.5rem;">🏰 ${location}</h3>
+        <p style="color: var(--got-silver);"><strong>Ruling House:</strong> ${house}</p>
+        <p style="color: var(--got-silver);"><strong>Region:</strong> ${region}</p>
+        <hr style="border: 1px solid var(--got-gold); margin: 1rem 0;">
+        <a href="#" style="color: var(--got-gold); text-decoration: none;" onclick="viewCharacters('${location}')">
+            View characters from ${location} →
+        </a>
+    `;
+    
+    panel.style.display = 'block';
+}
+
+function closeInfoPanel() {
+    document.getElementById('location-info-panel').style.display = 'none';
+}
+
+function viewCharacters(location) {
+    // Redirect to characters page filtered by location
+    window.location.href = `/characters/?location=${encodeURIComponent(location)}`;
+}
+
+// Add zoom functionality
+document.getElementById('main-map-image').addEventListener('wheel', function(e) {
+    e.preventDefault();
+    // Simple zoom (you'd want more sophisticated zoom with pan)
+    const scale = e.deltaY > 0 ? 0.9 : 1.1;
+    this.style.transform = `scale(${scale})`;
+    this.style.transformOrigin = 'center';
+});
+</script>
+
+<style>
+    /* Map container styles */
+    .map-page-container {
+        background: var(--got-black);
+    }
+    
+    #main-map-image {
+        transition: transform 0.1s ease;
+    }
+    
+    /* Area hover effect */
+    area {
+        cursor: pointer;
+    }
+    
+    /* Custom tooltip */
+    area:hover + .map-tooltip {
+        display: block;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .map-page-container {
+            padding: 60px 0 0 0;
+        }
+        
+        #location-info-panel {
+            width: 250px;
+            bottom: 10px;
+            right: 10px;
+        }
+    }
+</style>
 {% endblock %}

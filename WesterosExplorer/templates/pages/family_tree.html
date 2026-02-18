@@ -347,14 +347,81 @@ function renderTree(data) {
             .on('end', dragended));
     
     // Add circles
-    node.append('circle')
-        .attr('r', d => getNodeSize(d))
-        .attr('fill', d => getHouseColor(d.house))
-        .attr('stroke', d => d.dragon ? '#FFD700' : '#C5A028')
-        .attr('stroke-width', d => d.dragon ? 4 : 2)
-        .on('click', (event, d) => showCharacterDetails(d))
-        .on('mouseover', (event, d) => showTooltip(event, d))
-        .on('mouseout', hideTooltip);
+    <!-- In the node section, replace the existing circle and text with this: -->
+<g class="node" transform="translate(0,0)">
+    <!-- Background circle -->
+    <circle
+        r="35"
+        fill="url(#houseGradient)"
+        stroke="{{ node.stroke_color|default:'#C5A028' }}"
+        stroke-width="3"
+        style="filter: drop-shadow(0 0 5px {{ node.glow_color|default:'gold' }});"
+    ></circle>
+    
+    <!-- Character image (if available) -->
+    <clipPath id="clip-{{ node.id }}">
+        <circle r="32" cx="0" cy="0" />
+    </clipPath>
+    
+    {% if node.image %}
+    <image
+        href="{{ node.image }}"
+        x="-32"
+        y="-32"
+        width="64"
+        height="64"
+        clip-path="url(#clip-{{ node.id }})"
+        preserveAspectRatio="xMidYMid slice"
+    />
+    {% else %}
+    <!-- Fallback: House sigil or initials -->
+    <text
+        x="0"
+        y="10"
+        text-anchor="middle"
+        fill="white"
+        font-size="24"
+        font-family="Cinzel"
+    >
+        {{ node.initials }}
+    </text>
+    {% endif %}
+    
+    <!-- Dragon rider indicator -->
+    {% if node.dragon %}
+    <text
+        x="20"
+        y="-20"
+        font-size="16"
+        fill="gold"
+    >🐉</text>
+    {% endif %}
+    
+    <!-- Character name -->
+    <text
+        x="0"
+        y="50"
+        text-anchor="middle"
+        fill="white"
+        font-size="12"
+        font-family="Cinzel"
+        style="text-shadow: 1px 1px 2px black;"
+    >
+        {{ node.name }}
+    </text>
+    
+    <!-- House indicator -->
+    <text
+        x="0"
+        y="65"
+        text-anchor="middle"
+        fill="{{ node.house_color }}"
+        font-size="10"
+        font-family="Cinzel"
+    >
+        {{ node.house_name }}
+    </text>
+</g>
     
     // Add text labels
     node.append('text')

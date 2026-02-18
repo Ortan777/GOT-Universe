@@ -4,80 +4,269 @@
 {% block content %}
 <div style="padding: 100px 2rem 2rem 2rem;">
     <div style="max-width: 1400px; margin: 0 auto;">
-        <h1 style="color: var(--got-gold); text-align: center; margin-bottom: 2rem;">
-            <i class="fas fa-users"></i> {{ title }}
+        
+        <!-- Header -->
+        <h1 style="color: var(--got-gold); text-align: center; margin-bottom: 2rem; font-size: 2.5rem; letter-spacing: 4px;">
+            <i class="fas fa-users"></i> CHARACTERS OF WESTEROS
         </h1>
         
-        <!-- Stats -->
-        <div style="text-align: center; margin-bottom: 3rem; color: var(--got-silver);">
-            <p style="font-size: 1.2rem;">Total Characters: <span style="color: var(--got-gold); font-weight: bold;">{{ total_characters }}</span></p>
+        <!-- Stats, Search and Filter Row -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem;">
+            
+            <!-- Stats -->
+            <div style="color: var(--got-silver);">
+                <span style="font-size: 1.2rem;">Total Characters: </span>
+                <span style="color: var(--got-gold); font-weight: bold; font-size: 1.5rem;">{{ total_characters }}</span>
+            </div>
+            
+            <!-- Search Bar - NEW -->
+            <div style="flex-grow: 1; max-width: 400px; margin: 0 1rem;">
+                <form method="get" action="." style="display: flex; gap: 0.5rem;">
+                    <input type="text" 
+                           name="search" 
+                           placeholder="Search by name, title, culture..." 
+                           value="{{ request.GET.search|default:'' }}"
+                           style="flex: 1; padding: 0.5rem 1rem; background: var(--got-black); color: var(--got-silver); border: 1px solid var(--got-gold); border-radius: 4px; font-family: 'Cormorant Garamond', serif;">
+                    
+                    {% if request.GET.house %}
+                    <input type="hidden" name="house" value="{{ request.GET.house }}">
+                    {% endif %}
+                    
+                    <button type="submit" style="background: var(--got-gold); color: var(--got-black); border: none; padding: 0.5rem 1.5rem; border-radius: 4px; cursor: pointer; font-family: 'Cinzel', serif; transition: all 0.3s;">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    
+                    {% if request.GET.search or request.GET.house %}
+                    <a href="." style="background: transparent; color: var(--got-gold); border: 1px solid var(--got-gold); padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; display: flex; align-items: center; transition: all 0.3s;">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                    {% endif %}
+                </form>
+            </div>
+            
+            <!-- House Filter -->
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <label style="color: var(--got-gold); font-size: 1.1rem;">Filter by House:</label>
+                <select onchange="filterByHouse(this.value)" class="house-filter" style="padding: 0.5rem 1rem; background: var(--got-black); color: var(--got-silver); border: 1px solid var(--got-gold); border-radius: 4px; font-family: 'Cormorant Garamond', serif; min-width: 200px;">
+                    <option value="">All Houses</option>
+                    {% for house in houses %}
+                    <option value="{{ house.id }}" {% if request.GET.house == house.id|stringformat:"s" %}selected{% endif %}>
+                        {{ house.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
         
-        <!-- House Filter -->
-        <div style="margin-bottom: 2rem; text-align: center;">
-            <label style="color: var(--got-gold); margin-right: 1rem;">Filter by House:</label>
-            <select onchange="filterByHouse(this.value)" style="padding: 0.5rem; background: var(--got-black); color: var(--got-silver); border: 1px solid var(--got-gold); border-radius: 4px;">
-                <option value="">All Houses</option>
-                {% for house in houses %}
-                <option value="{{ house.id }}" {% if request.GET.house == house.id|stringformat:"s" %}selected{% endif %}>
-                    {{ house.name }}
-                </option>
-                {% endfor %}
-            </select>
+        <!-- Search Results Info - NEW -->
+        {% if request.GET.search %}
+        <div style="margin-bottom: 1.5rem; padding: 0.5rem 1rem; background: rgba(197, 160, 40, 0.1); border-left: 4px solid var(--got-gold); border-radius: 4px;">
+            <p style="color: var(--got-silver); margin: 0;">
+                <i class="fas fa-search" style="color: var(--got-gold); margin-right: 0.5rem;"></i>
+                Search results for: <strong style="color: var(--got-gold);">"{{ request.GET.search }}"</strong>
+                <span style="margin-left: 1rem;">Found <strong style="color: var(--got-gold);">{{ characters|length }}</strong> characters</span>
+            </p>
         </div>
+        {% endif %}
         
         <!-- Character Grid -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 2rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem;">
             {% for character in characters %}
+            <!-- Character Card -->
             <div class="character-card" onclick="window.location.href='{% url 'character_detail' character.id %}'" 
-                 style="background: rgba(0,0,0,0.5); border: 1px solid var(--got-gold); border-radius: 8px; padding: 1rem; text-align: center; cursor: pointer; transition: transform 0.3s;">
-                <div style="width: 100%; height: 250px; background: linear-gradient(45deg, var(--got-dark-red), var(--got-black)); border-radius: 8px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center;">
-                    <span style="font-size: 4rem; color: var(--got-gold);">
-                        <i class="fas fa-user-circle"></i>
-                    </span>
-                </div>
-                <h3 style="color: var(--got-gold); margin-bottom: 0.5rem;">{{ character.name }}</h3>
-                {% if character.house %}
-                <p style="color: var(--got-silver);">House {{ character.house.name }}</p>
-                {% endif %}
-                {% if character.titles %}
-                <p style="font-size: 0.9rem; color: var(--got-silver);">{{ character.titles.0 }}</p>
-                {% endif %}
-                <div style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: center;">
-                    {% if character.born %}
-                    <span style="background: var(--got-dark-red); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">Born: {{ character.born }}</span>
+                 style="background: rgba(0,0,0,0.5); border: 1px solid var(--got-gold); border-radius: 12px; overflow: hidden; cursor: pointer; transition: all 0.3s; height: 440px; display: flex; flex-direction: column;">
+                
+                <!-- Image Section -->
+                <div style="height: 280px; min-height: 280px; max-height: 280px; background: linear-gradient(135deg, var(--got-dark-red), var(--got-black)); display: flex; align-items: center; justify-content: center; border-bottom: 2px solid var(--got-gold); overflow: hidden; position: relative;">
+                    
+                    {% if character.image %}
+                        <img src="{{ character.image.url }}" alt="{{ character.name }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+                    {% elif character.house %}
+                        <div style="text-align: center;">
+                            <span style="font-size: 5rem; color: var(--got-gold);">
+                                <i class="fas fa-shield-alt"></i>
+                            </span>
+                            {% if character.house.sigil %}
+                            <div style="font-size: 2rem; color: var(--got-gold); margin-top: 0.5rem;">
+                                {{ character.house.name|slice:":2"|upper }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <span style="font-size: 5rem; color: var(--got-gold);">
+                            <i class="fas fa-user-circle"></i>
+                        </span>
                     {% endif %}
+                    
+                    <!-- Dragon Rider Badge -->
+                    {% if character.dragon %}
+                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--got-gold); display: flex; align-items: center; justify-content: center; z-index: 10;">
+                        <span style="font-size: 1.5rem; line-height: 1;">🐉</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Content Section -->
+                <div style="padding: 1rem; text-align: center; height: 160px; display: flex; flex-direction: column; overflow: hidden;">
+                    
+                    <!-- Name -->
+                    <div style="margin-bottom: 0.25rem; height: 50px; display: flex; align-items: center; justify-content: center;">
+                        <h3 style="color: var(--got-gold); margin: 0; font-size: 1.2rem; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; max-width: 100%;" 
+                            title="{{ character.name }}">
+                            {{ character.name }}
+                        </h3>
+                    </div>
+                    
+                    <!-- House -->
+                    <div style="height: 30px; margin-bottom: 0.25rem; display: flex; align-items: center; justify-content: center;">
+                        {% if character.house %}
+                        <p style="color: var(--got-silver); margin: 0; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;" 
+                           title="House {{ character.house.name }}">
+                            House {{ character.house.name }}
+                        </p>
+                        {% else %}
+                        <p style="color: var(--got-silver); margin: 0; font-size: 0.95rem; opacity: 0.5;">
+                            No House
+                        </p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Dragon Info -->
+                    <div style="height: 40px; display: flex; align-items: center; justify-content: center;">
+                        {% if character.dragon %}
+                        <div style="background: rgba(197,160,40,0.15); padding: 0.25rem 1rem; border-radius: 20px; border: 1px solid var(--got-gold); max-width: 100%;">
+                            <span style="color: var(--got-gold); font-size: 0.9rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; max-width: 100%;" 
+                                  title="{{ character.dragon }}">
+                                <i class="fas fa-dragon" style="margin-right: 0.3rem; font-size: 0.8rem;"></i> {{ character.dragon }}
+                            </span>
+                        </div>
+                        {% else %}
+                        <!-- Empty placeholder to maintain height -->
+                        <div style="height: 32px;"></div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
             {% empty %}
-            <p style="text-align: center; grid-column: 1/-1;">No characters found.</p>
+            <div style="text-align: center; grid-column: 1/-1; padding: 3rem; background: rgba(0,0,0,0.5); border: 1px solid var(--got-gold); border-radius: 12px;">
+                <i class="fas fa-search" style="font-size: 3rem; color: var(--got-gold); margin-bottom: 1rem; opacity: 0.5;"></i>
+                <p style="color: var(--got-silver); font-size: 1.2rem;">No characters found matching your criteria.</p>
+                <a href="." style="display: inline-block; margin-top: 1rem; color: var(--got-gold); text-decoration: none; border: 1px solid var(--got-gold); padding: 0.5rem 1.5rem; border-radius: 4px;">Clear Filters</a>
+            </div>
             {% endfor %}
         </div>
         
         <!-- Pagination -->
         {% if is_paginated %}
-        <div style="margin-top: 3rem; text-align: center;">
+        <div style="margin-top: 3rem; text-align: center; display: flex; justify-content: center; align-items: center; gap: 1rem;">
             {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.house %}&house={{ request.GET.house }}{% endif %}" class="btn-secondary" style="text-decoration: none;">Previous</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.house %}&house={{ request.GET.house }}{% endif %}" 
+               style="color: var(--got-gold); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--got-gold); border-radius: 4px; transition: all 0.3s;">
+                <i class="fas fa-chevron-left"></i> Previous
+            </a>
             {% endif %}
             
-            <span style="margin: 0 1rem; color: var(--got-gold);">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            <span style="color: var(--got-gold);">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
             
             {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.house %}&house={{ request.GET.house }}{% endif %}" class="btn-secondary" style="text-decoration: none;">Next</a>
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.house %}&house={{ request.GET.house }}{% endif %}" 
+               style="color: var(--got-gold); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--got-gold); border-radius: 4px; transition: all 0.3s;">
+                Next <i class="fas fa-chevron-right"></i>
+            </a>
             {% endif %}
         </div>
         {% endif %}
     </div>
 </div>
 
+<style>
+    .character-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0 30px rgba(197, 160, 40, 0.3);
+    }
+    
+    /* Ensure ALL cards are exactly the same size */
+    .character-card {
+        height: 440px !important;
+        min-height: 440px !important;
+        max-height: 440px !important;
+    }
+    
+    /* Search button hover effect */
+    button[type="submit"]:hover {
+        background: transparent !important;
+        color: var(--got-gold) !important;
+        border: 1px solid var(--got-gold) !important;
+    }
+    
+    /* Clear button hover effect */
+    a[href="."]:hover {
+        background: var(--got-gold) !important;
+        color: var(--got-black) !important;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .character-card {
+            height: 420px !important;
+            min-height: 420px !important;
+            max-height: 420px !important;
+        }
+        
+        .character-card div[style*="height: 280px"] {
+            height: 260px !important;
+            min-height: 260px !important;
+            max-height: 260px !important;
+        }
+        
+        .character-card h3 {
+            font-size: 1.1rem !important;
+        }
+        
+        /* Stack filter and search on mobile */
+        div[style*="justify-content: space-between"] {
+            flex-direction: column;
+            align-items: stretch !important;
+        }
+        
+        div[style*="max-width: 400px"] {
+            max-width: 100% !important;
+            margin: 0 !important;
+        }
+    }
+</style>
+
 <script>
 function filterByHouse(houseId) {
+    let url = new URL(window.location.href);
     if (houseId) {
-        window.location.href = '?house=' + houseId;
+        url.searchParams.set('house', houseId);
     } else {
-        window.location.href = '.';
+        url.searchParams.delete('house');
     }
+    // Preserve search parameter when filtering
+    const searchParam = url.searchParams.get('search');
+    if (searchParam) {
+        url.searchParams.set('search', searchParam);
+    }
+    window.location.href = url.toString();
 }
+
+// Live search (optional - uncomment if you want real-time search)
+/*
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('input[name="search"]');
+    let timeout = null;
+    
+    searchInput.addEventListener('keyup', function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(function() {
+            document.querySelector('form[method="get"]').submit();
+        }, 500);
+    });
+});
+*/
 </script>
 {% endblock %}

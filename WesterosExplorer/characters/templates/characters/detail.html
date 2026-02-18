@@ -3,92 +3,304 @@
 
 {% block content %}
 <div style="padding: 100px 2rem 2rem 2rem;">
-    <div style="max-width: 1000px; margin: 0 auto;">
+    <div style="max-width: 1200px; margin: 0 auto;">
         <!-- Back button -->
         <a href="{% url 'character_list' %}" style="color: var(--got-gold); text-decoration: none; margin-bottom: 2rem; display: inline-block;">
             <i class="fas fa-arrow-left"></i> Back to Characters
         </a>
         
-        <!-- Character Header -->
-        <div style="display: flex; gap: 3rem; margin-bottom: 3rem; background: rgba(0,0,0,0.5); padding: 2rem; border: 1px solid var(--got-gold); border-radius: 12px;">
-            <div style="width: 300px; height: 400px; background: linear-gradient(45deg, var(--got-dark-red), var(--got-black)); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                <span style="font-size: 8rem; color: var(--got-gold);">
-                    <i class="fas fa-user-circle"></i>
-                </span>
+        <!-- Character Header with Image Gallery -->
+        <div style="display: grid; grid-template-columns: 300px 1fr; gap: 2rem; margin-bottom: 2rem; background: rgba(0,0,0,0.5); border: 1px solid var(--got-gold); border-radius: 12px; padding: 2rem;">
+            
+            <!-- Left Column - Image Section -->
+            <div class="character-image-section">
+                <!-- Main Image -->
+                <div class="main-image-container" style="width: 100%; height: 300px; background: linear-gradient(135deg, var(--got-dark-red), var(--got-black)); border: 2px solid var(--got-gold); border-radius: 8px; overflow: hidden; cursor: pointer; position: relative; margin-bottom: 1rem;">
+                    {% if character.image %}
+                        <img src="{{ character.image.url }}" 
+                             alt="{{ character.name }}"
+                             class="main-character-image"
+                             id="mainCharacterImage"
+                             onclick="openImageModal('{{ character.image.url }}')"
+                             style="width: 100%; height: 100%; object-fit: cover;">
+                    {% elif character.house %}
+                        <div style="width: 100%; height: 100%; background: linear-gradient(135deg, {{ character.house.color|default:'#4A0404' }}, #000); display: flex; align-items: center; justify-content: center;">
+                            <span style="font-size: 5rem; color: var(--got-gold);">{{ character.house.name|slice:":2"|upper }}</span>
+                        </div>
+                    {% else %}
+                        <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--got-dark-red), var(--got-black)); display: flex; align-items: center; justify-content: center;">
+                            <span style="font-size: 5rem; color: var(--got-gold);">{{ character.name|slice:":2"|upper }}</span>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Dragon Rider Badge -->
+                    {% if character.dragon %}
+                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); padding: 0.5rem; border-radius: 20px; border: 1px solid var(--got-gold); display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.2rem;">🐉</span>
+                        <span style="color: var(--got-gold); font-size: 0.9rem;">{{ character.dragon }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Thumbnail Gallery (if multiple images) -->
+                {% if character.gallery_images %}
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
+                    {% for image in character.gallery_images %}
+                    <div onclick="changeMainImage('{{ image.url }}')" style="height: 60px; background: var(--got-black); border: 1px solid var(--got-gold); border-radius: 4px; overflow: hidden; cursor: pointer;">
+                        <img src="{{ image.thumbnail.url }}" alt="{{ character.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
             </div>
             
-            <div style="flex: 1;">
-                <h1 style="color: var(--got-gold); font-size: 3rem; margin-bottom: 0.5rem;">{{ character.name }}</h1>
-                
-                {% if character.house %}
-                <p style="color: var(--got-silver); font-size: 1.5rem; margin-bottom: 1rem;">House {{ character.house.name }}</p>
-                {% endif %}
+            <!-- Right Column - Character Info -->
+            <div class="character-info-section">
+                <!-- Name -->
+                <h1 style="color: var(--got-gold); font-size: 2.5rem; margin-top: 0; margin-bottom: 1rem; border-bottom: 2px solid var(--got-gold); padding-bottom: 0.5rem;">
+                    {{ character.name }}
+                </h1>
                 
                 <!-- Also known as -->
                 {% if character.also_known_as %}
                 <div style="margin-bottom: 1rem;">
-                    <strong style="color: var(--got-gold);">Also known as:</strong>
-                    <p style="color: var(--got-silver);">{{ character.also_known_as|join:", " }}</p>
+                    <strong style="color: var(--got-gold); display: block; margin-bottom: 0.3rem;">Also known as:</strong>
+                    <p style="color: var(--got-silver); margin: 0;">{{ character.also_known_as|join:", " }}</p>
                 </div>
                 {% endif %}
                 
                 <!-- Titles -->
                 {% if character.titles %}
                 <div style="margin-bottom: 1rem;">
-                    <strong style="color: var(--got-gold);">Titles:</strong>
-                    <ul style="color: var(--got-silver); margin-left: 1.5rem;">
+                    <strong style="color: var(--got-gold); display: block; margin-bottom: 0.3rem;">Titles:</strong>
+                    <ul style="color: var(--got-silver); margin: 0; padding-left: 1.5rem;">
                         {% for title in character.titles %}
-                        <li>{{ title }}</li>
+                        <li style="margin-bottom: 0.2rem;">{{ title }}</li>
                         {% endfor %}
                     </ul>
                 </div>
                 {% endif %}
-                
-                <!-- Dragon -->
-                {% if character.dragon %}
-                <div style="margin-bottom: 1rem;">
-                    <strong style="color: var(--got-gold);">Dragon:</strong>
-                    <span style="color: var(--got-silver);">{{ character.dragon }}</span>
-                </div>
-                {% endif %}
             </div>
         </div>
         
-        <!-- Life Details -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+        <!-- Life Details and Dragon Info - Two Column Layout -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+            
+            <!-- Life Details Box -->
             <div style="background: rgba(0,0,0,0.5); padding: 1.5rem; border: 1px solid var(--got-gold); border-radius: 8px;">
-                <h2 style="color: var(--got-gold); margin-bottom: 1rem;">Life Details</h2>
-                <p><strong style="color: var(--got-gold);">Born:</strong> <span style="color: var(--got-silver);">{{ character.born|default:"Unknown" }}</span></p>
-                <p><strong style="color: var(--got-gold);">Died:</strong> <span style="color: var(--got-silver);">{{ character.died|default:"Still alive" }}</span></p>
-                <p><strong style="color: var(--got-gold);">Culture:</strong> <span style="color: var(--got-silver);">{{ character.culture|default:"Unknown" }}</span></p>
-                <p><strong style="color: var(--got-gold);">Gender:</strong> <span style="color: var(--got-silver);">{{ character.get_gender_display }}</span></p>
+                <h2 style="color: var(--got-gold); margin-top: 0; margin-bottom: 1.5rem; border-bottom: 1px solid var(--got-gold); padding-bottom: 0.5rem;">
+                    <i class="fas fa-calendar-alt" style="margin-right: 0.5rem;"></i> Life Details
+                </h2>
+                
+                <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                    <!-- Born -->
+                    <div style="display: grid; grid-template-columns: 100px 1fr;">
+                        <strong style="color: var(--got-gold);">Born:</strong>
+                        <span style="color: var(--got-silver);">
+                            {% if character.born %}
+                                {{ character.born }}{% if character.born > 0 %} AC{% else %} BC{% endif %}
+                            {% else %}
+                                Unknown
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <!-- Died -->
+                    <div style="display: grid; grid-template-columns: 100px 1fr;">
+                        <strong style="color: var(--got-gold);">Died:</strong>
+                        <span style="color: var(--got-silver);">
+                            {% if character.died %}
+                                {{ character.died }}{% if character.died > 0 %} AC{% else %} BC{% endif %}
+                            {% else %}
+                                Still alive
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <!-- Culture -->
+                    <div style="display: grid; grid-template-columns: 100px 1fr;">
+                        <strong style="color: var(--got-gold);">Culture:</strong>
+                        <span style="color: var(--got-silver);">{{ character.culture|default:"Unknown" }}</span>
+                    </div>
+                    
+                    <!-- Gender -->
+                    <div style="display: grid; grid-template-columns: 100px 1fr;">
+                        <strong style="color: var(--got-gold);">Gender:</strong>
+                        <span style="color: var(--got-silver);">{{ character.get_gender_display }}</span>
+                    </div>
+                    
+                    <!-- House -->
+                    {% if character.house %}
+                    <div style="display: grid; grid-template-columns: 100px 1fr;">
+                        <strong style="color: var(--got-gold);">House:</strong>
+                        <span style="color: var(--got-silver);">House {{ character.house.name }}</span>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
             
+            <!-- Dragon Info Box (NEW) -->
             <div style="background: rgba(0,0,0,0.5); padding: 1.5rem; border: 1px solid var(--got-gold); border-radius: 8px;">
-                <h2 style="color: var(--got-gold); margin-bottom: 1rem;">Family</h2>
-                {% if father %}
-                <p><strong style="color: var(--got-gold);">Father:</strong> <a href="{% url 'character_detail' father.id %}" style="color: var(--got-silver);">{{ father.name }}</a></p>
-                {% endif %}
-                {% if mother %}
-                <p><strong style="color: var(--got-gold);">Mother:</strong> <a href="{% url 'character_detail' mother.id %}" style="color: var(--got-silver);">{{ mother.name }}</a></p>
-                {% endif %}
-                {% if character.spouse.all %}
-                <p><strong style="color: var(--got-gold);">Spouse(s):</strong> 
-                    {% for spouse in character.spouse.all %}
-                    <a href="{% url 'character_detail' spouse.id %}" style="color: var(--got-silver);">{{ spouse.name }}</a>{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
-                </p>
+                <h2 style="color: var(--got-gold); margin-top: 0; margin-bottom: 1.5rem; border-bottom: 1px solid var(--got-gold); padding-bottom: 0.5rem;">
+                    <i class="fas fa-dragon" style="margin-right: 0.5rem;"></i> Dragon Info
+                </h2>
+                
+                {% if character.dragon %}
+                    <!-- Dragon Rider -->
+                    <div style="text-align: center;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem; animation: float 3s ease-in-out infinite;">🐉</div>
+                        <p style="color: var(--got-gold); font-size: 1.3rem; margin-bottom: 0.5rem; font-weight: bold;">
+                            Dragon Rider
+                        </p>
+                        <div style="background: rgba(197, 160, 40, 0.15); padding: 1rem; border-radius: 8px; border: 1px solid var(--got-gold); margin-bottom: 0.5rem;">
+                            <p style="color: var(--got-silver); font-size: 1.2rem; margin: 0;">
+                                {{ character.dragon }}
+                            </p>
+                        </div>
+                        
+                        <!-- Dragon Facts -->
+                        {% with dragon_name=character.dragon|lower %}
+                            {% if "balerion" in dragon_name %}
+                                <p style="color: var(--got-silver); font-size: 0.95rem; margin-top: 1rem; padding: 0.5rem; background: rgba(0,0,0,0.3); border-radius: 4px;">
+                                    <i class="fas fa-fire" style="color: var(--got-gold); margin-right: 0.3rem;"></i> 
+                                    The Black Dread - Largest dragon in history
+                                </p>
+                            {% elif "vhagar" in dragon_name %}
+                                <p style="color: var(--got-silver); font-size: 0.95rem; margin-top: 1rem; padding: 0.5rem; background: rgba(0,0,0,0.3); border-radius: 4px;">
+                                    <i class="fas fa-fire" style="color: var(--got-gold); margin-right: 0.3rem;"></i> 
+                                    Survived the Conquest, died in the Dance of Dragons
+                                </p>
+                            {% elif "caraxes" in dragon_name %}
+                                <p style="color: var(--got-silver); font-size: 0.95rem; margin-top: 1rem; padding: 0.5rem; background: rgba(0,0,0,0.3); border-radius: 4px;">
+                                    <i class="fas fa-fire" style="color: var(--got-gold); margin-right: 0.3rem;"></i> 
+                                    The Blood Wyrm - Fierce and experienced
+                                </p>
+                            {% elif "syrax" in dragon_name %}
+                                <p style="color: var(--got-silver); font-size: 0.95rem; margin-top: 1rem; padding: 0.5rem; background: rgba(0,0,0,0.3); border-radius: 4px;">
+                                    <i class="fas fa-fire" style="color: var(--got-gold); margin-right: 0.3rem;"></i> 
+                                    Named after a Valyrian goddess
+                                </p>
+                            {% elif "meleys" in dragon_name %}
+                                <p style="color: var(--got-silver); font-size: 0.95rem; margin-top: 1rem; padding: 0.5rem; background: rgba(0,0,0,0.3); border-radius: 4px;">
+                                    <i class="fas fa-fire" style="color: var(--got-gold); margin-right: 0.3rem;"></i> 
+                                    The Red Queen - Swift and deadly
+                                </p>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                    
+                {% elif character.house and character.house.name == 'Targaryen' %}
+                    <!-- Targaryen with no dragon -->
+                    <div style="text-align: center;">
+                        <div style="font-size: 3.5rem; margin-bottom: 1rem; opacity: 0.7;">🏰</div>
+                        <p style="color: var(--got-silver); font-size: 1.1rem; margin-bottom: 1rem;">
+                            No dragon
+                        </p>
+                        
+                        {% if character.born %}
+                            {% if character.born < 0 %}
+                                <!-- Born BC -->
+                                <div style="background: rgba(165, 216, 255, 0.1); padding: 0.8rem; border-radius: 6px; border-left: 3px solid #A5D8FF;">
+                                    <p style="color: var(--got-silver); margin: 0; font-size: 0.95rem;">
+                                        <i class="fas fa-clock" style="color: #A5D8FF; margin-right: 0.3rem;"></i>
+                                        Lived before dragons came to Westeros
+                                    </p>
+                                </div>
+                            {% elif character.born > 150 %}
+                                <!-- Born after dragons died out -->
+                                <div style="background: rgba(139, 0, 0, 0.1); padding: 0.8rem; border-radius: 6px; border-left: 3px solid var(--got-blood);">
+                                    <p style="color: var(--got-silver); margin: 0; font-size: 0.95rem;">
+                                        <i class="fas fa-skull" style="color: var(--got-blood); margin-right: 0.3rem;"></i>
+                                        Lived after the dragons died out
+                                    </p>
+                                </div>
+                            {% else %}
+                                <!-- Could have had dragon but doesn't -->
+                                <div style="background: rgba(197, 160, 40, 0.1); padding: 0.8rem; border-radius: 6px;">
+                                    <p style="color: var(--got-silver); margin: 0; font-size: 0.95rem;">
+                                        Never claimed a dragon
+                                    </p>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    
+                {% else %}
+                    <!-- Non-Targaryen -->
+                    <div style="text-align: center;">
+                        <div style="font-size: 3.5rem; margin-bottom: 1rem; opacity: 0.5;">❌</div>
+                        <p style="color: var(--got-silver); font-size: 1.1rem; opacity: 0.7;">
+                            Not a dragon rider
+                        </p>
+                        <p style="color: var(--got-silver); font-size: 0.9rem; margin-top: 1rem;">
+                            Only members of House Targaryen<br>typically ride dragons
+                        </p>
+                    </div>
                 {% endif %}
             </div>
         </div>
         
-        <!-- Family Members -->
+        <!-- Family Section -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+            <!-- Family Box -->
+            <div style="background: rgba(0,0,0,0.5); padding: 1.5rem; border: 1px solid var(--got-gold); border-radius: 8px;">
+                <h2 style="color: var(--got-gold); margin-top: 0; margin-bottom: 1.5rem; border-bottom: 1px solid var(--got-gold); padding-bottom: 0.5rem;">
+                    <i class="fas fa-tree" style="margin-right: 0.5rem;"></i> Family
+                </h2>
+                
+                <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                    <!-- Father -->
+                    {% if father %}
+                    <div style="display: grid; grid-template-columns: 100px 1fr;">
+                        <strong style="color: var(--got-gold);">Father:</strong>
+                        <a href="{% url 'character_detail' father.id %}" style="color: var(--got-silver); text-decoration: none; border-bottom: 1px solid var(--got-gold);">
+                            {{ father.name }}
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Mother -->
+                    {% if mother %}
+                    <div style="display: grid; grid-template-columns: 100px 1fr;">
+                        <strong style="color: var(--got-gold);">Mother:</strong>
+                        <a href="{% url 'character_detail' mother.id %}" style="color: var(--got-silver); text-decoration: none; border-bottom: 1px solid var(--got-gold);">
+                            {{ mother.name }}
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Spouse(s) -->
+                    {% if character.spouse.all %}
+                    <div style="display: grid; grid-template-columns: 100px 1fr;">
+                        <strong style="color: var(--got-gold);">Spouse(s):</strong>
+                        <span style="color: var(--got-silver);">
+                            {% for spouse in character.spouse.all %}
+                            <a href="{% url 'character_detail' spouse.id %}" style="color: var(--got-silver); text-decoration: none; border-bottom: 1px solid var(--got-gold);">
+                                {{ spouse.name }}
+                            </a>{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Empty box for spacing (or could add additional info) -->
+            <div></div>
+        </div>
+        
+        <!-- Children Section -->
         {% if children %}
         <div style="background: rgba(0,0,0,0.5); padding: 1.5rem; border: 1px solid var(--got-gold); border-radius: 8px; margin-bottom: 2rem;">
-            <h2 style="color: var(--got-gold); margin-bottom: 1rem;">Children</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">
+            <h2 style="color: var(--got-gold); margin-top: 0; margin-bottom: 1.5rem; border-bottom: 1px solid var(--got-gold); padding-bottom: 0.5rem;">
+                <i class="fas fa-child" style="margin-right: 0.5rem;"></i> Children
+            </h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;">
                 {% for child in children %}
-                <a href="{% url 'character_detail' child.id %}" style="color: var(--got-silver); text-decoration: none; padding: 0.5rem; background: rgba(197,160,40,0.1); border-radius: 4px; text-align: center;">
+                <a href="{% url 'character_detail' child.id %}" style="color: var(--got-silver); text-decoration: none; padding: 0.8rem; background: rgba(197,160,40,0.1); border: 1px solid var(--got-gold); border-radius: 6px; text-align: center; transition: all 0.3s; display: block;"
+                   onmouseover="this.style.background='rgba(197,160,40,0.2)'; this.style.transform='translateY(-2px)';"
+                   onmouseout="this.style.background='rgba(197,160,40,0.1)'; this.style.transform='translateY(0)';">
                     {{ child.name }}
                 </a>
                 {% endfor %}
@@ -96,12 +308,18 @@
         </div>
         {% endif %}
         
+        <!-- Siblings Section -->
         {% if siblings %}
         <div style="background: rgba(0,0,0,0.5); padding: 1.5rem; border: 1px solid var(--got-gold); border-radius: 8px;">
-            <h2 style="color: var(--got-gold); margin-bottom: 1rem;">Siblings</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">
+            <h2 style="color: var(--got-gold); margin-top: 0; margin-bottom: 1.5rem; border-bottom: 1px solid var(--got-gold); padding-bottom: 0.5rem;">
+                <i class="fas fa-users" style="margin-right: 0.5rem;"></i> Siblings
+            </h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;">
                 {% for sibling in siblings %}
-                <a href="{% url 'character_detail' sibling.id %}" style="color: var(--got-silver); text-decoration: none; padding: 0.5rem; background: rgba(197,160,40,0.1); border-radius: 4px; text-align: center;">
+                <a href="{% url 'character_detail' sibling.id %}" style="color: var(--got-silver); text-decoration: none; padding: 0.8rem; background: rgba(197,160,40,0.1); border: 1px solid var(--got-gold); border-radius: 6px; text-align: center; transition: all 0.3s; display: block;"
+                   onmouseover="this.style.background='rgba(197,160,40,0.2)'; this.style.transform='translateY(-2px)';"
+                   onmouseout="this.style.background='rgba(197,160,40,0.1)'; this.style.transform='translateY(0)';">
                     {{ sibling.name }}
                 </a>
                 {% endfor %}
@@ -110,4 +328,106 @@
         {% endif %}
     </div>
 </div>
+
+<!-- Image Modal -->
+<div id="imageModal" onclick="closeImageModal()" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9);">
+    <span style="position: absolute; top: 20px; right: 35px; color: var(--got-gold); font-size: 40px; font-weight: bold; cursor: pointer;">&times;</span>
+    <img class="modal-content" id="modalImage" style="margin: auto; display: block; max-width: 80%; max-height: 80%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 3px solid var(--got-gold);">
+    <div id="modalCaption" style="margin: auto; display: block; width: 80%; text-align: center; color: var(--got-silver); padding: 10px 0; position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);"></div>
+</div>
+
+<style>
+/* Image Modal Styles */
+.image-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.9);
+}
+
+.modal-content {
+    margin: auto;
+    display: block;
+    max-width: 80%;
+    max-height: 80%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 3px solid var(--got-gold);
+}
+
+.close-modal {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: var(--got-gold);
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-modal:hover {
+    color: var(--got-silver);
+}
+
+/* Hover effects for family links */
+.family-link:hover {
+    background: rgba(197,160,40,0.2);
+    transform: translateY(-2px);
+}
+
+/* Dragon animation */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .character-header {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .main-image-container {
+        height: 250px !important;
+    }
+    
+    div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+
+<script>
+function openImageModal(imageUrl) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    modal.style.display = 'block';
+    modalImg.src = imageUrl;
+}
+
+function closeImageModal() {
+    document.getElementById('imageModal').style.display = 'none';
+}
+
+function changeMainImage(imageUrl) {
+    const mainImage = document.getElementById('mainCharacterImage');
+    if (mainImage) {
+        mainImage.src = imageUrl;
+    }
+}
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeImageModal();
+    }
+});
+</script>
 {% endblock %}

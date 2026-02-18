@@ -136,3 +136,22 @@ def character_detail_api(request, character_id):
         return JsonResponse(data)
     except Character.DoesNotExist:
         return JsonResponse({'error': 'Character not found'}, status=404)
+    
+def search_suggestions(request):
+    query = request.GET.get('q', '')
+    if len(query) < 2:
+        return JsonResponse([], safe=False)
+    
+    characters = Character.objects.filter(
+        Q(name__icontains=query) |
+        Q(house__name__icontains=query)
+    )[:5]
+    
+    suggestions = [{
+        'id': c.id,
+        'name': c.name,
+        'house': c.house.name if c.house else None,
+        'url': c.get_absolute_url()
+    } for c in characters]
+    
+    return JsonResponse(suggestions, safe=False)
